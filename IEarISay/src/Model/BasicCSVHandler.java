@@ -105,7 +105,6 @@ public class BasicCSVHandler implements CSVHandler{
 				//Write nextLineToWrite in the csv, and go to the next line
 				this.myBufferedWriter.append(nextLineToWrite);
 				this.myBufferedWriter.newLine();
-				
 			}
 			
 		}

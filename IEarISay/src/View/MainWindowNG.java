@@ -449,14 +449,6 @@ public class MainWindowNG extends JFrame
 	 */
 	public void shuffleWords()
 	{
-//		if (allWord.indexOf(START_LABEL) == -1)
-//		{
-//			allWord.set(0, START_LABEL);
-//		}
-//		if (allWord.indexOf(END_LABEL) == -1)
-//		{
-//			allWord.add(END_LABEL);
-//		}
 		Collections.shuffle(allWord);
 	}
 
