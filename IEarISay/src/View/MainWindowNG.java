@@ -42,7 +42,7 @@ import Model.GenerateGridBehavior;
 
 /**
  * 
- * This is the main class, where the window is generated and updated.
+ * {@link JFrame}
  *
  */
 public class MainWindowNG extends JFrame
