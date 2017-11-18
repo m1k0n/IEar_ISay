@@ -13,7 +13,7 @@ public class Main
 
 	public static void main(String[] args)
 	{
-		JFrame myMainWindow = new MainWindowNG("TOTOTOTO!");
+		JFrame myMainWindow = new MainWindowNG("I Ear, I Say");
 		myMainWindow.setLocationRelativeTo(null);
 		myMainWindow.setVisible(true);
 	}

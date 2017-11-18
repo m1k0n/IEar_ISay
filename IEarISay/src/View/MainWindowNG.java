@@ -33,6 +33,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import utils.ApplicationConstants;
+import utils.DominosUtils;
 import Model.BasicCSVHandler;
 import Model.CSVHandler;
 import Model.DefaultCSVHandler;
@@ -47,11 +49,6 @@ import Model.GenerateGridBehavior;
  */
 public class MainWindowNG extends JFrame
 {
-
-	private static final String START_LABEL = "Start";
-
-	private static final String END_LABEL = "End";
-
 	private int nbLines = 5;
 
 	private int nbCol = 6; // MUST BE EVEN (nbRows/2 = 0)
@@ -72,51 +69,9 @@ public class MainWindowNG extends JFrame
 	{
 		super(titre);
 
-		// Those 4 lines manage the language of the applications
-		Locale newLocale = new Locale("en");
-		Locale.setDefault(newLocale);
-		UIManager.getDefaults().setDefaultLocale(newLocale);
-		JComponent.setDefaultLocale(newLocale);
-		try
-		{
-			this.setIconImage(ImageIO.read(getClass().getResourceAsStream("/flex.png")));
-		}
-		catch (IOException e1)
-		{
-			JOptionPane.showMessageDialog(this, e1.getMessage());
-		}
-
-		// Graphical interface
-		try
-		{
-			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
-			{
-				if ("Nimbus".equals(info.getName()))
-				{
-					UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			System.out.println(e);
-		}
-
-		super.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		this.addWindowListener(new WindowAdapter()
-		{
-			@Override
-			public void windowClosing(WindowEvent e)
-			{
-				if (JOptionPane.showConfirmDialog(null, "Quit ?", "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-				{
-					System.exit(0);
-				}
-			}
-		});
-
-		setContentPane(inside());
+		configure();
+		
+		setContentPane(createInsidePanel());
 		Dimension dimensionMinimale = new Dimension(900, 250);
 		this.setMinimumSize(dimensionMinimale);
 		pack();
@@ -128,9 +83,8 @@ public class MainWindowNG extends JFrame
 	 * 
 	 * @return JPanel
 	 */
-	private JPanel inside()
+	private JPanel createInsidePanel()
 	{
-
 		JPanel boutons = new JPanel(new GridLayout(6, 1));
 		JPanel result = new JPanel(new BorderLayout());
 
@@ -181,7 +135,7 @@ public class MainWindowNG extends JFrame
 				// }
 
 				shuffleWords();
-				fillGridAfterShuffle(nettoyerDominos(distribuerDominos(genererDominos())));
+				fillGridAfterShuffle(DominosUtils.shuffleDominos(allWord, nbCol));
 			}
 		});
 
@@ -338,14 +292,19 @@ public class MainWindowNG extends JFrame
 		}
 	}
 
+	private void createGrid()
+	{
+		
+	}
+	
 	// Fill the panel 'grid' with buttons using this.nbButtons
 	public void fillGrid(final ArrayList<String> alWord)
 	{
 		grid.removeAll();
 		if (this.nbButtons > 0)
 		{
-			JButton buttonStart = new JButton(START_LABEL);
-			JButton buttonEnd = new JButton(END_LABEL);
+			JButton buttonStart = new JButton(ApplicationConstants.START_LABEL);
+			JButton buttonEnd = new JButton(ApplicationConstants.END_LABEL);
 
 			buttonStart.setEnabled(false);
 			buttonEnd.setEnabled(false);
@@ -411,17 +370,17 @@ public class MainWindowNG extends JFrame
 		if (this.nbButtons > 0)
 		{
 			String buttonText = this.defaultText;// variable containing next pair of button's content
-			
+
 			for (Domino domino : dominos)
 			{
 				HearSayCombo combo = new HearSayCombo();
 				combo.getIHearButton().setText(domino.getFirstWord());
 				combo.getISayButton().setText(domino.getSecondWord());
-				
+
 				grid.add(combo.getIHearButton());
 				grid.add(combo.getISayButton());
 			}
-			
+
 			grid.validate();
 			grid.repaint();
 		}
@@ -518,106 +477,53 @@ public class MainWindowNG extends JFrame
 		this.generateGridBehavior = new DefaultGenerateGridBehavior(this.nbCol);
 		this.generateGrid();
 	}
-	
-	
-	private List<Domino> genererDominos()
+
+	private void configure()
 	{
-		List<Domino> dominos = new ArrayList<Domino>();
-		String lastUsedWord = null;
-		for (String string : allWord)
+		// Those 4 lines manage the language of the applications
+		Locale newLocale = new Locale("en");
+		Locale.setDefault(newLocale);
+		UIManager.getDefaults().setDefaultLocale(newLocale);
+		JComponent.setDefaultLocale(newLocale);
+		try
 		{
-			if (dominos.isEmpty())
-			{
-				dominos.add(new Domino(START_LABEL, string));
-			}
-			else
-			{
-				dominos.add(new Domino(lastUsedWord, string));
-			}
-			lastUsedWord = string;
+			this.setIconImage(ImageIO.read(getClass().getResourceAsStream("/flex.png")));
 		}
-		dominos.add(new Domino(lastUsedWord, END_LABEL));
-		return dominos;
-	}
-	
-	private List<List<Domino>> distribuerDominos(List<Domino> dominos)
-	{
-		int nbDominos = dominos.size();
-		List<List<Domino>> result = new ArrayList<List<Domino>>();
-		int nbJoueurs = nbCol / 2;
-		for (int i = 0; i < nbJoueurs; i++)
+		catch (IOException e)
 		{
-			result.add(new ArrayList<Domino>());
+			JOptionPane.showMessageDialog(this, e.getMessage());
 		}
-		
-		result.get(0).add(dominos.remove(0));
-		int lastJoueur = 0;
-		
-		Iterator<Domino> iter = dominos.iterator();
-		while (iter.hasNext())
+
+		// Graphical interface
+		try
 		{
-			Domino next = iter.next();
-			int idxToAdd = -1;
-			int nbMinDominosDejaAjoutes = 10000;
-			List<Integer> sau = new ArrayList<>();
-			for (int i = 0 ; i < nbJoueurs; i++)
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
 			{
-				if (i == lastJoueur)
+				if ("Nimbus".equals(info.getName()))
 				{
-					continue;
-				}
-				if (result.get(i).size() == nbMinDominosDejaAjoutes)
-				{
-					nbMinDominosDejaAjoutes = result.get(i).size();
-					sau.add(i);
-				}
-				else if (result.get(i).size() < nbMinDominosDejaAjoutes)
-				{
-					nbMinDominosDejaAjoutes = result.get(i).size();
-					sau.clear();
-					sau.add(i);
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
 				}
 			}
-			int sauSize = sau.size();
-			if (sauSize == 1)
-			{
-				idxToAdd = sau.get(0);
-			}
-			else
-			{
-				Random rand = new Random();
-				idxToAdd = sau.get(rand.nextInt(sauSize));
-			}
-			
-			if (idxToAdd != -1)
-			{
-				result.get(idxToAdd).add(next);
-				lastJoueur = idxToAdd;
-			}
-			
 		}
-		
-		return result;
-	}
-	
-	private List<Domino> nettoyerDominos(List<List<Domino>> dominos)
-	{
-		List<Domino> listeFinale = new ArrayList<Domino>();
-		
-		int nbJoueurs = nbCol / 2;
-		int nbDominosParJoueurs = dominos.get(0).size();
-		int nbDominoAjoutes = 0;
-		
-		while (nbDominoAjoutes < nbDominosParJoueurs)
+		catch (Exception e)
 		{
-			for (int idx = 0; idx < nbJoueurs; idx++)
-			{
-				listeFinale.add(dominos.get(idx).get(nbDominoAjoutes));
-			}
-			nbDominoAjoutes++;
+			JOptionPane.showMessageDialog(this, e.getMessage());
 		}
+
+		super.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.addWindowListener(new WindowAdapter()
+		{
+			@Override
+			public void windowClosing(WindowEvent e)
+			{
+				if (JOptionPane.showConfirmDialog(null, "Quit ?", "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+				{
+					System.exit(0);
+				}
+			}
+		});
+
 		
-		
-		return listeFinale;
 	}
 }

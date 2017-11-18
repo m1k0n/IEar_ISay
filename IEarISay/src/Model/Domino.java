@@ -6,8 +6,14 @@ public class Domino
 	
 	private String secondWord;
 	
+	public Domino()
+	{
+		super();
+	}
+	
 	public Domino(String firstWord, String secondWord)
 	{
+		super();
 		this.firstWord = firstWord;
 		this.secondWord = secondWord;
 	}
