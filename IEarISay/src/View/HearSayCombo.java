@@ -72,12 +72,6 @@ public class HearSayCombo {
 		this.ISayButton.setBackground(colorISay);	
 		
 		this.IHearButton.setEnabled(false);
-		
-		//this.IHearButton.setBorder(BorderButtons);
-		//this.ISayButton.setBorder(BorderButtons);
-		
-//		panelToAddButtons.add(this.ISayButton);
-//		panelToAddButtons.add(this.IHearButton);
 	}
 	
 

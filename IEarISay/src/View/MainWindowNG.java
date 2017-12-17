@@ -64,6 +64,8 @@ public class MainWindowNG extends JFrame
 	private GenerateGridBehavior generateGridBehavior;
 
 	private CSVHandler csvHandler;
+	
+	private List<Domino> dominos;
 
 	public MainWindowNG(String titre)
 	{
@@ -93,7 +95,7 @@ public class MainWindowNG extends JFrame
 		Border BorderTitledGrid2 = BorderFactory.createTitledBorder("Your choice");
 
 		this.allWord = new ArrayList<String>(); // Reset the ArrayList to have empty buttons
-		fillGrid(allWord);
+		fillGrid();
 		grid.setBorder(BorderTitledGrid);
 		// End of the creation of the grid
 
@@ -124,18 +126,12 @@ public class MainWindowNG extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-
-				/*
-				 * Fill the ArrayList with empty Strings to match the number of pair in the grid Used to shuffle properly
-				 */
-				// FAUX ?
-				// while (allWord.size() * 2 + 2 < nbButtons)
-				// {
-				// allWord.add("");
-				// }
-
 				shuffleWords();
-				fillGridAfterShuffle(DominosUtils.shuffleDominos(allWord, nbCol));
+//				fillGridAfterShuffle(DominosUtils.shuffleDominos(allWord, nbCol));
+				List<Domino> dominosMelanges = DominosUtils.shuffleDominos(dominos, nbCol);
+				fillGridAfterShuffle(dominosMelanges);
+				dominos.clear();
+				dominos.addAll(dominosMelanges);
 			}
 		});
 
@@ -242,7 +238,7 @@ public class MainWindowNG extends JFrame
 					grid.setLayout(new GridLayout(this.nbLines, this.nbCol));
 
 					this.allWord = new ArrayList<String>(); // Reset the ArrayList to have empty buttons
-					fillGrid(this.allWord);
+					fillGrid();
 
 				}
 
@@ -260,9 +256,6 @@ public class MainWindowNG extends JFrame
 					null,
 					null,
 					0);
-
-			// int nbWord = userText.length() - userText.replace(";", "").length(); //number of word to put in the grid (=
-			// number of ';' in user's input)
 
 			// The following lines will splits the user input and add each word(separated by ';') to the ArrayList<String>
 			// alWord
@@ -288,17 +281,11 @@ public class MainWindowNG extends JFrame
 			this.generateGridBehavior = new DefaultGenerateGridBehavior(newNbCol);
 
 			this.generateGrid();
-
 		}
 	}
 
-	private void createGrid()
-	{
-		
-	}
-	
 	// Fill the panel 'grid' with buttons using this.nbButtons
-	public void fillGrid(final ArrayList<String> alWord)
+	public void fillGrid()
 	{
 		grid.removeAll();
 		if (this.nbButtons > 0)
@@ -347,9 +334,15 @@ public class MainWindowNG extends JFrame
 						if (newText != null)
 						{ // if user correctly entered a new String
 							temp.setText(newText);
-							alWord.add(newText);
+							allWord.add(newText);
+							
+							if (dominos == null)
+							{
+								dominos = new ArrayList<Domino>();
+							}
+							dominos.clear();
+							dominos = DominosUtils.genererDominos(allWord);
 						}
-
 					}
 				});
 
@@ -400,7 +393,7 @@ public class MainWindowNG extends JFrame
 		this.nbLines = this.generateGridBehavior.generateNbLines(this.nbButtons);
 		this.nbCol = this.generateGridBehavior.generateNbColumns();
 		grid.setLayout(new GridLayout(this.nbLines, this.nbCol));
-		fillGrid(allWord);
+		fillGrid();
 	}
 
 	/**
@@ -439,8 +432,9 @@ public class MainWindowNG extends JFrame
 			{
 				destinationFile = new File(chooser.getSelectedFile().getPath());
 			}
+			this.csvHandler.updateNbCol();
 			// if the grid was successfully exported, notify the user
-			if (this.csvHandler.exportGridToCsv(destinationFile, this.allWord))
+			if (this.csvHandler.exportGridToCsv(destinationFile, this.dominos))
 			{
 				JOptionPane.showMessageDialog(this,
 						"The grid has been successfully exported",
@@ -449,8 +443,8 @@ public class MainWindowNG extends JFrame
 			}
 		}
 
-		this.csvHandler.updateNbCol();
-		this.csvHandler.exportGridToCsv(destinationFile, this.allWord);
+//		this.csvHandler.updateNbCol();
+//		this.csvHandler.exportGridToCsv(destinationFile, this.allWord);
 
 	}
 

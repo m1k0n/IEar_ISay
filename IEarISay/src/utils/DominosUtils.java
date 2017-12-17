@@ -21,15 +21,15 @@ public class DominosUtils
 	}
 	
 	
-	public static List<Domino> shuffleDominos(List<String> words, int nbCol)
+	public static List<Domino> shuffleDominos(List<Domino> dominos, int nbCol)
 	{
-		List<Domino> dominos = genererDominos(words);
+//		List<Domino> dominos = genererDominos(words);
 		List<List<Domino>> shuffledDominos = distribuerDominos(dominos, nbCol);
 		
 		return nettoyerDominos(shuffledDominos, nbCol);
 	}
 	
-	private static List<Domino> genererDominos(List<String> words)
+	public static List<Domino> genererDominos(List<String> words)
 	{
 		List<Domino> dominos = new ArrayList<Domino>();
 		String lastUsedWord = null;

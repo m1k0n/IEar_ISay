@@ -2,10 +2,11 @@ package Model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public interface CSVHandler {	
 	
-	public boolean exportGridToCsv(File file, ArrayList<String> alString);
+	public boolean exportGridToCsv(File file, List<Domino> domnios);
 	
 	public void updateNbCol();
 	
