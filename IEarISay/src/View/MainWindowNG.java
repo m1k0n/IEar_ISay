@@ -465,6 +465,12 @@ public class MainWindowNG extends JFrame
 		{
 			file = chooser.getSelectedFile();
 			this.allWord = this.csvHandler.importCsv(file);
+			if (dominos == null)
+			{
+				dominos = new ArrayList<Domino>();
+			}
+			dominos.clear();
+			dominos = DominosUtils.genererDominos(allWord);
 			this.nbCol = this.csvHandler.getNbColumnsRead();
 			this.nbButtons = (this.allWord.size() * 2) + 2;
 		}
