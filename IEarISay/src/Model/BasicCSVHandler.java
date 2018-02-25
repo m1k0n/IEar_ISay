@@ -143,7 +143,7 @@ public class BasicCSVHandler implements CSVHandler{
 					//This for start at 1 in order to skip the first cell, assuming it is always "Start" and is therefore not required in the ArrayList
 					for (int i = 1; i < sizeLine; i+=2) {
 						
-						if(!tabString[i].equals("End ")){
+						if(!tabString[i].contains("End")){
 							aLImport.add(tabString[i]);
 						}
 						
